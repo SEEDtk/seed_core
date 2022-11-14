@@ -14,7 +14,7 @@ following.
 
     my $results = $annoObject->function_name($args);
 
-where C<$annoObject> is an object created by this module, 
+where C<$annoObject> is an object created by this module,
 C<$args> is a parameter structure, and C<function_name> is the Annotation Support
 Server function name. The output $results is a scalar, generally a hash
 reference, but sometimes a string or a list reference.
@@ -34,7 +34,7 @@ more information on how to create this object and the options available.
 use LWP::UserAgent;
 use Data::Dumper;
 use YAML;
-use YAML::XS;
+use YAML::XS qw();
 use JSON::Any;
 
 use base qw(ClientThing);
@@ -221,7 +221,7 @@ The attempt is made using kmer-technology.  A pass through the sequence
 will locate "signature kmers", and scores will be computed.
 The scores are based on the number of nonoverlapping hits, the number of
 overlapping hits, and the difference in counts between hits against the
-most probable function's kmer-set and the next most probable function's 
+most probable function's kmer-set and the next most probable function's
 kmer set.  Basically, we compute all matching kmers.  Then, we split them
 into sets based on the predictions each would make (each kmer, in effect,
 predicts a single function).  One threshhold (the B<scoreThreshold>) is
@@ -259,7 +259,7 @@ Specify the kmer size to use for analysis (valid sizes are 7 - 12).
 =item -assignToAll
 
 If TRUE, then if the standard matching algorithm fails to assign a protein,
-a similarity-based assignment algorithm will be used instead.    
+a similarity-based assignment algorithm will be used instead.
 
 =item -scoreThreshold N
 
@@ -311,16 +311,16 @@ sub assign_function_to_prot
     my $input = delete $args->{-input};
 
     my $assign_to_all = $args->{-assignToAll};
-    
+
     my $params = [ map { $_ => $args->{$_} } keys %$args ];
 
     if (ref($input) eq 'ARRAY')
     {
-	$wq = SequenceListWorkQueue->new($input);
+    $wq = SequenceListWorkQueue->new($input);
     }
     else
     {
-	$wq = FastaWorkQueue->new($input);
+    $wq = FastaWorkQueue->new($input);
     }
 
     my $req_bytes = $assign_to_all ? 100_000 : 1_000_000;
@@ -330,16 +330,16 @@ sub assign_function_to_prot
     my $unpack = \&YAML::XS::Load;
 
     return ResultHandler->new($self, $wq, $self->{server_url}, 'assign_function_to_prot', \&id_seq_pair_bundler,
-			      #\&tab_delimited_output_parser,
-			      $unpack,
-			      $params, $req_bytes);
+                  #\&tab_delimited_output_parser,
+                  $unpack,
+                  $params, $req_bytes);
 }
 
 =head3 call_genes
 
     my $result = $annoObject->call_genes($args);
 
-Call the protein-encoding genes for the specified DNA sequences. 
+Call the protein-encoding genes for the specified DNA sequences.
 
 =over 4
 
@@ -409,14 +409,14 @@ sub call_genes
                   -minContigLen => ($args->{-minContigLen} || 2000),
                   -verbose => ($args->{-verbose} || 0),
                   };
-    
+
     for my $fileKey (keys %{CALL_GENES_FILE_PARMS()}) {
         my $fileData = $args->{$fileKey};
         if (defined $fileData) {
             my $input = [];
             if (ref($fileData) eq 'ARRAY') {
                 # $input = $fileData;
-		push(@$input, map { $_->[0] . "," . $_->[2] } @$fileData);
+        push(@$input, map { $_->[0] . "," . $_->[2] } @$fileData);
             } else {
                 my $fh;
                 if (ref($fileData)) {
@@ -496,42 +496,42 @@ sub find_rnas
     my($self, $args) = _handle_args(@_);
 
     my $input = delete $args->{-input};
-    
+
     my $params = [ map { $_ => $args->{$_} } keys %$args ];
 
     if (ref($input) eq 'ARRAY')
     {
-	if (@$input)
-	{
-	    if (ref($input->[0]))
-	    {
-		@$input = map { $_->[0] . "," . $_->[2] } @$input;
-	    }
-	}
+    if (@$input)
+    {
+        if (ref($input->[0]))
+        {
+        @$input = map { $_->[0] . "," . $_->[2] } @$input;
+        }
+    }
     }
     else
     {
-	my $fh;
-	if (ref($input))
-	{
-	    $fh = $input;
-	}
-	else
-	{
-	    my $fasta_file = $input;
-	    open($fh, "<", $fasta_file);
-	}
-	$input = [];
-	while (my($id, $seqp, $com) = FastaWorkQueue::read_fasta_record($fh))
-	{
-	    push(@$input, "$id,$$seqp");
-	}
-	close($fh);
+    my $fh;
+    if (ref($input))
+    {
+        $fh = $input;
+    }
+    else
+    {
+        my $fasta_file = $input;
+        open($fh, "<", $fasta_file);
+    }
+    $input = [];
+    while (my($id, $seqp, $com) = FastaWorkQueue::read_fasta_record($fh))
+    {
+        push(@$input, "$id,$$seqp");
+    }
+    close($fh);
     }
 
     return $self->run_query_form([function => "find_rnas",
-				  @$params,
-				  id_seq => $input]);
+                  @$params,
+                  id_seq => $input]);
 }
 
 =head3 assign_functions_to_dna
@@ -556,7 +556,7 @@ are as follows.
 The sequences to be analyzed. This may take one of two forms:
 
 1. An file handle that is open for reading from a file of DNA sequences in FASTA format, or
-    
+
 2. A reference to a list of sequence data entries. Each entry is a triple of strings
 [sequence-id, comment, dna-sequence-data].
 
@@ -595,25 +595,25 @@ sub assign_functions_to_dna
 {
     my($self, $args) = _handle_args(@_);
     my $wq;
-    
+
     my $input = delete $args->{-input};
-    
+
     my $params = [ map { $_ => $args->{$_} } keys %$args ];
 
     if (ref($input) eq 'ARRAY')
     {
-	$wq = SequenceListWorkQueue->new($input);
+    $wq = SequenceListWorkQueue->new($input);
     }
     else
     {
-	$wq = FastaWorkQueue->new($input);
+    $wq = FastaWorkQueue->new($input);
     }
 
     my $req_bytes = 500_000;
 
     return ResultHandler->new($self, $wq, $self->{server_url}, 'assign_functions_to_DNA',
-			      \&id_seq_pair_bundler,
-			      \&tab_delimited_output_parser, $params, $req_bytes);
+                  \&id_seq_pair_bundler,
+                  \&tab_delimited_output_parser, $params, $req_bytes);
 }
 
 ###### Utility Methods ######
@@ -622,9 +622,9 @@ sub run_query
 {
     my($self, $function, @args ) = @_;
     my $form = [function  => $function,
-		encoding => 'yaml2',
-		args => YAML::XS::Dump(\@args),
-		];
+        encoding => 'yaml2',
+        args => YAML::XS::Dump(\@args),
+        ];
     return $self->run_query_form($form);
 }
 
@@ -634,29 +634,29 @@ sub run_query_form
 
     my $res = $self->_send_request($form);
     #my $res = $self->{ua}->post($self->{server_url}, $form);
-    
+
     if ($res)
     {
-	my $content = $res;
-	if ($raw)
-	{
-	    return $content;
-	}
-	     
+    my $content = $res;
+    if ($raw)
+    {
+        return $content;
+    }
+
 #	print "Got $content\n";
-	my $ret;
-	eval { 
-	    $ret = YAML::XS::Load($content);
-	};
-	if ($@)
-	{
-	    die "Query returned unparsable content ($@): " . $content;
-	}
-	return $ret;
+    my $ret;
+    eval {
+        $ret = YAML::XS::Load($content);
+    };
+    if ($@)
+    {
+        die "Query returned unparsable content ($@): " . $content;
+    }
+    return $ret;
     }
     else
     {
-	die "run_query_form: error encountered";
+    die "run_query_form: error encountered";
     }
 }
 
@@ -697,7 +697,7 @@ sub _handle_args
     if (defined $args)
     {
         if (scalar @_ gt 1)
-	{
+    {
             # Here we have multiple arguments. We check the first one for a
             # leading hyphen.
             if ($args =~ /^-/) {
@@ -732,16 +732,16 @@ sub new
     my($class, $server_obj, $work_queue, $server_url, $function, $input_bundler, $output_parser, $form_vars, $req_bytes) = @_;
 
     my $self = {
-	server_obj => $server_obj,
-	work_queue => $work_queue,
-	server_url => $server_url,
-	function => $function,
-	input_bundler => $input_bundler,
-	output_parser => $output_parser,
-	ua => LWP::UserAgent->new(),
-	cur_result => undef,
-	form_vars => $form_vars ? $form_vars : [],
-	req_bytes => ($req_bytes ? $req_bytes : 16000),
+    server_obj => $server_obj,
+    work_queue => $work_queue,
+    server_url => $server_url,
+    function => $function,
+    input_bundler => $input_bundler,
+    output_parser => $output_parser,
+    ua => LWP::UserAgent->new(),
+    cur_result => undef,
+    form_vars => $form_vars ? $form_vars : [],
+    req_bytes => ($req_bytes ? $req_bytes : 16000),
     };
     $self->{ua}->timeout(20 * 60);
     return bless $self, $class;
@@ -756,42 +756,42 @@ sub get_next
 
     if ($res)
     {
-	return $res;
+    return $res;
     }
     else
     {
-	
-	while (my @inp = $self->{work_queue}->get_next_n_bytes($self->{req_bytes}))
-	{
-	    my $form = [@{$self->{form_vars}}];
-	    push(@$form, function => $self->{function},
-			 map { &{$self->{input_bundler}}($_) } @inp);
-	    # print "Invoke " .Dumper($form);
+
+    while (my @inp = $self->{work_queue}->get_next_n_bytes($self->{req_bytes}))
+    {
+        my $form = [@{$self->{form_vars}}];
+        push(@$form, function => $self->{function},
+             map { &{$self->{input_bundler}}($_) } @inp);
+        # print "Invoke " .Dumper($form);
 
 #	    my $res = $self->{ua}->post($self->{server_url}, $form);
-	    my $res = $self->{server_obj}->_send_request($form);
-	    if (defined($res))
-	    {
-		eval { 
-		    $self->{cur_result} = [YAML::XS::Load($res)];
-		};
-		if ($@)
-		{
-		    die "Query returned unparsable content ($@): " . $res->content;
-		}
-		#print "res: " . Dumper($self->{cur_result});
-		my $oneres =  $self->get_next_from_result();
-		if ($oneres)
-		{
-		    return $oneres;
-		}
-	    }
-	    else
-	    {
-		die "error on post";
-	    }
-	}
-	return;
+        my $res = $self->{server_obj}->_send_request($form);
+        if (defined($res))
+        {
+        eval {
+            $self->{cur_result} = [YAML::XS::Load($res)];
+        };
+        if ($@)
+        {
+            die "Query returned unparsable content ($@): " . $res->content;
+        }
+        #print "res: " . Dumper($self->{cur_result});
+        my $oneres =  $self->get_next_from_result();
+        if ($oneres)
+        {
+            return $oneres;
+        }
+        }
+        else
+        {
+        die "error on post";
+        }
+    }
+    return;
     }
 }
 
@@ -801,12 +801,12 @@ sub get_next_from_result
     my $l = $self->{cur_result};
     if ($l and @$l)
     {
-	return shift(@$l);
+    return shift(@$l);
     }
     else
     {
-	delete $self->{cur_result};
-	return undef;
+    delete $self->{cur_result};
+    return undef;
     }
 }
 
@@ -818,7 +818,7 @@ sub new
     my($class) = @_;
 
     my $self = {};
-    
+
     return bless $self, $class;
 }
 
@@ -826,18 +826,18 @@ sub get_next_n
 {
     my($self, $n) = @_;
     my @out;
-    
+
     for (my $i = 0;$i < $n; $i++)
     {
-	my($id, $com, $seqp) = $self->get_next();
-	if (defined($id))
-	{
-	    push(@out, [$id, $com, $seqp]);
-	}
-	else
-	{
-	    last;
-	}
+    my($id, $com, $seqp) = $self->get_next();
+    if (defined($id))
+    {
+        push(@out, [$id, $com, $seqp]);
+    }
+    else
+    {
+        last;
+    }
     }
     return @out;
 }
@@ -850,16 +850,16 @@ sub get_next_n_bytes
     my $size = 0;
     while ($size < $n)
     {
-	my($id, $com, $seqp) = $self->get_next();
-	if (defined($id))
-	{
-	    push(@out, [$id, $com, $seqp]);
-	    $size += (ref($seqp) eq 'SCALAR') ? length($$seqp) : length($seqp);
-	}
-	else
-	{
-	    last;
-	}
+    my($id, $com, $seqp) = $self->get_next();
+    if (defined($id))
+    {
+        push(@out, [$id, $com, $seqp]);
+        $size += (ref($seqp) eq 'SCALAR') ? length($$seqp) : length($seqp);
+    }
+    else
+    {
+        last;
+    }
     }
     return @out;
 }
@@ -876,11 +876,11 @@ sub new
     my $fh;
     if (ref($input))
     {
-	$fh = $input;
+    $fh = $input;
     }
     else
     {
-	$fh = new FileHandle("<$input");
+    $fh = new FileHandle("<$input");
     }
 
     my $self = $class->SUPER::new();
@@ -937,7 +937,7 @@ sub new
     my $fh;
     if (ref($input) ne 'ARRAY')
     {
-	die "SequenceWorkQueue requires a list as input";
+    die "SequenceWorkQueue requires a list as input";
     }
 
     my $self = $class->SUPER::new();

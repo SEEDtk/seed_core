@@ -34,7 +34,7 @@ package SeedAware;
 #      stderr => $file  # stderr will be sent to $file (e.g., '/dev/null')
 #
 #  The file name may begin with '<' or '>', but these are not necessary.
-#  If the supplied name begins with '>>', output will be appended to the file.a  
+#  If the supplied name begins with '>>', output will be appended to the file.a
 #
 #  Simpler versions without redirects:
 #
@@ -189,6 +189,7 @@ BEGIN {
     open $REAL_STDOUT, '>>&=' . fileno(*STDOUT);
     open $REAL_STDERR, '>>&=' . fileno(*STDERR);
 }
+no warnings "once";
 
 #
 # Bah. On Windows, redirecty stuff needs IPC::Run.
@@ -238,7 +239,7 @@ BEGIN
 #      stdout => $file  # Where process should write to
 #      stderr => $file  # Where stderr should be sent (/dev/null comes to mind)
 #
-#  '>' and '<' are not necessary, but use '>>' for appending to output files.  
+#  '>' and '<' are not necessary, but use '>>' for appending to output files.
 #===============================================================================
 sub system_with_redirect
 {
